@@ -83,10 +83,19 @@ def train_mlp_model(features, labels):
 
 
 def confusion_matrix_hand_made(labels, predictions):
-    tp = np.sum(np.logical_and(labels, predictions))  # true positive
-    fp = np.sum(np.logical_and(np.logical_not(labels), predictions))  # false positive
-    tn = np.sum(np.logical_and(np.logical_not(labels), np.logical_not(predictions))) # true negative
-    fn = np.sum(np.logical_and(labels, np.logical_not(predictions)))  # false negative
+
+    tp = np.logical_and(labels, predictions)
+    tp = np.sum(tp)
+
+    fp = np.logical_and(np.logical_not(labels), predictions)
+    fp = np.sum(fp)
+
+    tn = np.logical_and(np.logical_not(labels), np.logical_not(predictions))
+    tn = np.sum(tn)
+
+    fn = np.logical_and(labels, np.logical_not(predictions))
+    fn = np.sum(fn)
+
     return tp, fp, tn, fn
 
 
@@ -133,6 +142,8 @@ def main():
     print("Recall: ", recall)
     print("F1: ", f1)
     print("Confusion Matrix: \n")
+
+
     print(conufusion_mtrx[0], conufusion_mtrx[1])
     print(conufusion_mtrx[2], conufusion_mtrx[3])
 
