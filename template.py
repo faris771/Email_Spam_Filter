@@ -3,11 +3,9 @@ import csv
 import sys
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score, accuracy_score
 from sklearn.neural_network import MLPClassifier
 
 # %%
-from sklearn.neighbors import KNeighborsClassifier
 
 TEST_SIZE = 0.3
 K = 3
@@ -20,15 +18,21 @@ class NN:
         self.trainingLabels = trainingLabels
 
     def predict(self, testing_features, k):
-        classifier = KNeighborsClassifier(n_neighbors=k, p=2)  # p=2 is euclidean distance
-        classifier.fit(self.trainingFeatures, self.trainingLabels)
-        label_prediction = classifier.predict(testing_features)
-        return label_prediction
+        predictions = []
+        for feature in testing_features:
+            distances = np.sqrt(np.sum(np.square(np.subtract(self.trainingFeatures, feature)), axis=1))
+            nearest_indices = np.argsort(distances)[:k]
+            nearest_labels = [self.trainingLabels[i] for i in nearest_indices]
+            prediction = np.argmax(np.bincount(nearest_labels))
+            predictions.append(prediction)
+        return predictions
 
         """
+        
         Given a list of features vectors of testing examples
         return the predicted class labels (list of either 0s or 1s)
         using the k nearest neighbors
+        
         """
 
 
@@ -48,7 +52,7 @@ def load_data(filename):
     is 1 if spam, and 0 otherwise.
     """
 
-    return df.iloc[:, :-1].values, df.iloc[:, -1].values  # features, labels
+    return df.iloc[:, :-1].values.tolist(), df.iloc[:, -1].values.tolist()  # features, labels
 
 
 # %%
@@ -76,6 +80,15 @@ def train_mlp_model(features, labels):
     return model
 
 
+def confusion_matrix_hand_made(labels, predictions):
+    tp = np.sum(np.logical_and(labels, predictions))  # true positive
+    fp = np.sum(np.logical_and(np.logical_not(labels), predictions))  # false positive
+    tn = np.sum(np.logical_and(np.logical_not(labels), np.logical_not(predictions)))
+    # true negative
+    fn = np.sum(np.logical_and(labels, np.logical_not(predictions)))  # false negative
+    return tp, fp, tn, fn
+
+
 def evaluate(labels, predictions):
     """
     Given a list of actual labels and a list of predicted labels,
@@ -83,12 +96,12 @@ def evaluate(labels, predictions):
 
     Assume each label is either a 1 (positive) or 0 (negative).
     """
-    accuracy = accuracy_score(labels, predictions)
-    precision = precision_score(labels, predictions)
-    recall = recall_score(labels, predictions)
-    f1 = f1_score(labels, predictions)
-    confusion_mtrx = confusion_matrix(labels, predictions)
-    return accuracy, precision, recall, f1, confusion_mtrx
+    tp, fp, tn, fn = confusion_matrix_hand_made(labels, predictions)
+    accuracy = (tp + tn) / (tp + tn + fp + fn)
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1 = 2 * (precision * recall) / (precision + recall)
+    return accuracy, precision, recall, f1
 
 
 # %%
@@ -109,7 +122,9 @@ def main():
     # Train a k-NN model and make predictions
     model_nn = NN(X_train, y_train)
     predictions = model_nn.predict(X_test, K)
-    accuracy, precision, recall, f1, confusion_mtrx = evaluate(y_test, predictions)
+    accuracy, precision, recall, f1 = evaluate(y_test, predictions)
+    conufusion_mtrx = confusion_matrix_hand_made(y_test, predictions)
+
 
     # Print results
     print("**** k = 3 Nearest Neighbor Results ****")
@@ -117,12 +132,16 @@ def main():
     print("Precision: ", precision)
     print("Recall: ", recall)
     print("F1: ", f1)
-    print("Confusion Matrix: \n", confusion_mtrx)
+    print("Confusion Matrix: \n")
+    print(conufusion_mtrx[0], conufusion_mtrx[1])
+    print(conufusion_mtrx[2], conufusion_mtrx[3])
 
     # Train an MLP model and make predictions
     model = train_mlp_model(X_train, y_train)
     predictions = model.predict(X_test)
-    accuracy, precision, recall, f1, confusion_mtrx = evaluate(y_test, predictions)
+    accuracy, precision, recall, f1 = evaluate(y_test, predictions)
+    conufusion_mtrx = confusion_matrix_hand_made(y_test, predictions)
+
 
     # Print results
     print("**** MLP Results ****")
@@ -130,7 +149,9 @@ def main():
     print("Precision: ", precision)
     print("Recall: ", recall)
     print("F1: ", f1)
-    print("Confusion Matrix:\n ", confusion_mtrx)
+    print("Confusion Matrix: \n")
+    print(conufusion_mtrx[0], conufusion_mtrx[1])
+    print(conufusion_mtrx[2], conufusion_mtrx[3])
 
 
 if __name__ == "__main__":
