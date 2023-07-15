@@ -19,20 +19,22 @@ class NN:
 
     def predict(self, testing_features, k):
         predictions = []
-        for feature in testing_features: # for each feature in testing features
-            distances = np.sqrt(np.sum(np.square(np.subtract(self.trainingFeatures, feature)), axis=1)) # calculate the distance between the feature and each training feature
-            nearest_indices = np.argsort(distances)[:k] # get the indices of the k nearest training features
-            nearest_labels = [self.trainingLabels[i] for i in nearest_indices] # get the labels of the k nearest training features
-            prediction = np.argmax(np.bincount(nearest_labels)) # get the most frequent label
-            predictions.append(prediction) # add the prediction to the predictions list
+        for feature in testing_features:  # for each feature in testing features
+            distances = np.sqrt(np.sum(np.square(np.subtract(self.trainingFeatures, feature)),
+                                       axis=1))  # calculate the distance between the feature and each training feature
+            nearest_indices = np.argsort(distances)[:k]  # get the indices of the k nearest training features
+            nearest_labels = [self.trainingLabels[i] for i in
+                              nearest_indices]  # get the labels of the k nearest training features
+            prediction = np.argmax(np.bincount(nearest_labels))  # get the most frequent label
+            predictions.append(prediction)  # add the prediction to the predictions list
         return predictions
 
         """
-        
+
         Given a list of features vectors of testing examples
         return the predicted class labels (list of either 0s or 1s)
         using the k nearest neighbors
-        
+
         """
 
 
@@ -40,7 +42,7 @@ class NN:
 
 
 def load_data(filename):
-    df = pd.read_csv(filename,header=None)  # data frame
+    df = pd.read_csv(filename)  # data frame
     """
     Load spam data from a CSV file `filename` and convert into a list of
     features vectors and a list of target labels. Return a tuple (features, labels).
@@ -83,8 +85,7 @@ def train_mlp_model(features, labels):
 def confusion_matrix_hand_made(labels, predictions):
     tp = np.sum(np.logical_and(labels, predictions))  # true positive
     fp = np.sum(np.logical_and(np.logical_not(labels), predictions))  # false positive
-    tn = np.sum(np.logical_and(np.logical_not(labels), np.logical_not(predictions)))
-    # true negative
+    tn = np.sum(np.logical_and(np.logical_not(labels), np.logical_not(predictions))) # true negative
     fn = np.sum(np.logical_and(labels, np.logical_not(predictions)))  # false negative
     return tp, fp, tn, fn
 
@@ -114,7 +115,7 @@ def main():
 
     # Load data from spreadsheet and split into train and test sets
     features, labels = load_data(sys.argv[1])
-    # features = preprocess(features)  # MLP
+    features = preprocess(features)  # MLP
 
     X_train, X_test, y_train, y_test = train_test_split(
         features, labels, test_size=TEST_SIZE)
@@ -124,7 +125,6 @@ def main():
     predictions = model_nn.predict(X_test, K)
     accuracy, precision, recall, f1 = evaluate(y_test, predictions)
     conufusion_mtrx = confusion_matrix_hand_made(y_test, predictions)
-
 
     # Print results
     print("**** k = 3 Nearest Neighbor Results ****")
@@ -141,7 +141,6 @@ def main():
     predictions = model.predict(X_test)
     accuracy, precision, recall, f1 = evaluate(y_test, predictions)
     conufusion_mtrx = confusion_matrix_hand_made(y_test, predictions)
-
 
     # Print results
     print("**** MLP Results ****")
