@@ -19,12 +19,12 @@ class NN:
 
     def predict(self, testing_features, k):
         predictions = []
-        for feature in testing_features:
-            distances = np.sqrt(np.sum(np.square(np.subtract(self.trainingFeatures, feature)), axis=1))
-            nearest_indices = np.argsort(distances)[:k]
-            nearest_labels = [self.trainingLabels[i] for i in nearest_indices]
-            prediction = np.argmax(np.bincount(nearest_labels))
-            predictions.append(prediction)
+        for feature in testing_features: # for each feature in testing features
+            distances = np.sqrt(np.sum(np.square(np.subtract(self.trainingFeatures, feature)), axis=1)) # calculate the distance between the feature and each training feature
+            nearest_indices = np.argsort(distances)[:k] # get the indices of the k nearest training features
+            nearest_labels = [self.trainingLabels[i] for i in nearest_indices] # get the labels of the k nearest training features
+            prediction = np.argmax(np.bincount(nearest_labels)) # get the most frequent label
+            predictions.append(prediction) # add the prediction to the predictions list
         return predictions
 
         """
@@ -40,7 +40,7 @@ class NN:
 
 
 def load_data(filename):
-    df = pd.read_csv(filename)  # data frame
+    df = pd.read_csv(filename,header=None)  # data frame
     """
     Load spam data from a CSV file `filename` and convert into a list of
     features vectors and a list of target labels. Return a tuple (features, labels).
