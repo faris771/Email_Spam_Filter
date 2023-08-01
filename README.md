@@ -32,8 +32,8 @@ Ultimately, the best algorithm for spam filtering depends on the specific datase
 We experimented by calculating the confusion matrix, accuracy, precision, recall, and f1 score manually rather than using the scikit library for authenticity.
 
 
+![mtrxxx](https://github.com/faris771/Email_Spam_Filter/assets/70337488/3ce4823d-d7bc-422e-ab11-54cd977c8230)
 
-![mtrxxx](https://github.com/faris771/Email_Spam_Filter/assets/70337488/b6b82bf0-90b5-476b-b9e2-e87d719a3310)
 
 ## Contributors
 * [Faris Abufarha](https://github.com/faris771)
