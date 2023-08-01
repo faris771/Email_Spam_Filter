@@ -21,7 +21,7 @@ pip install -r requirements.txt
 To run the project, run the following command in the terminal:
 
 ```bash
-python main.py spambase.csv
+python template.py spambase.csv
 ```
 
 ## Results
